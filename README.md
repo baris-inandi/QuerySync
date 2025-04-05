@@ -1,2 +1,1 @@
-# QuerySync# QuerySync
 # QuerySync
