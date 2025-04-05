@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "types": ["@sveltejs/kit"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext"
+  }
+}
