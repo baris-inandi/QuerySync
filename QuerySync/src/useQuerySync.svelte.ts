@@ -6,7 +6,7 @@ import { EmptyFilters } from "./defaultFilters.svelte";
 import { DEFAULT_OPTIONS, type Options } from "./options";
 import { QuerySync } from "./QuerySyncClass";
 
-const DEBOUNCE_TIME = 150;
+const DEBOUNCE_TIME = 200;
 const TEMPLATE_STRING = "{qs}";
 
 export const useQuerySync = <T extends EmptyFilters>(
@@ -27,7 +27,6 @@ export const useQuerySync = <T extends EmptyFilters>(
         filtersState = qs.filters;
       } catch (error) {
         goToQSRoute(o.noFilterString);
-        isInitialLoad = false;
       }
     }
     isInitialLoad = false;
@@ -40,20 +39,15 @@ export const useQuerySync = <T extends EmptyFilters>(
       typeof o.pagePath === "function"
         ? o.pagePath()
         : o.pagePath.replace(TEMPLATE_STRING, qsString);
-    console.log("Updating path:", realPath);
     replaceState(realPath, undefined);
-  };
-
-  let effect = async () => {
-    if (!browser || isInitialLoad) return;
-    let qsString = await qs.toString();
-    goToQSRoute(qsString);
   };
 
   let onUpdate = () => {
     if (timeoutId !== null) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      effect();
+    timeoutId = setTimeout(async () => {
+      if (!browser || isInitialLoad) return;
+      let qsString = await qs.toString();
+      goToQSRoute(qsString);
       timeoutId = null;
     }, DEBOUNCE_TIME);
   };
