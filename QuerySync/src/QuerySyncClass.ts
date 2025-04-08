@@ -50,15 +50,19 @@ export class QuerySync<T extends EmptyFilters> {
     return compression.compress(shortened as JSONSerializable);
   }
 
-  async fromString(query: string): Promise<T> {
-    const shortened: Record<string, any> = await compression.decompress(query);
-    const expanded: T = new this.filtersClass();
-    for (const key in shortened) {
-      const expandedKey = this.expanderKeybindings[key];
-      if (expandedKey) {
-        (expanded[expandedKey] as Record<string, any>) = shortened[key];
+  async fromString(query: string) {
+    try {
+      const shortened: Record<string, any> = await compression.decompress(query);
+      const expanded: T = new this.filtersClass();
+      for (const key in shortened) {
+        const expandedKey = this.expanderKeybindings[key];
+        if (expandedKey) {
+          (expanded[expandedKey] as Record<string, any>) = shortened[key];
+        }
       }
+      this.filters = expanded;
+    } catch (error) {
+      throw new Error("Invalid QuerySync string");
     }
-    return expanded;
   }
 }

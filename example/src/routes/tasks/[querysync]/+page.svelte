@@ -5,6 +5,7 @@
   const filters = useQuerySync(TasksFilters, {
     pagePath: "/tasks/{qs}",
     apiPath: "/api/tasks/{qs}",
+    noFilterString: "all",
   });
 </script>
 
