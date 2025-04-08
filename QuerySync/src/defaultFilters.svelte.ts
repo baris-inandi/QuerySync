@@ -6,13 +6,13 @@ export class EmptyFilters {
 }
 
 export class TabularFilters extends EmptyFilters {
-  pageNumber: number = $state(1);
-  itemsPerPage: number = $state(50);
-  sortBy: string = $state("createdAt");
-  sortOrder: "asc" | "desc" = $state("desc");
-  fuzzySearchQuery: string = $state("");
-  createdAtStart: string = $state("");
-  createdAtEnd: string = $state("");
-  updatedAtStart: string = $state("");
-  updatedAtEnd: string = $state("");
+  pageNumber: number = 1;
+  itemsPerPage: number = 50;
+  sortBy: string = "createdAt";
+  sortOrder: "asc" | "desc" = "desc";
+  fuzzySearchQuery: string = "";
+  createdAtStart: string = "";
+  createdAtEnd: string = "";
+  updatedAtStart: string = "";
+  updatedAtEnd: string = "";
 }

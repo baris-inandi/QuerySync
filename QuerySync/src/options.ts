@@ -1,7 +1,11 @@
 export interface Options {
-  path: string;
+  pagePath: string;
+  apiPath: string;
+  emptyFilterRoute?: string;
 }
 
 export const DEFAULT_OPTIONS: Options = {
-  path: ""
+  pagePath: "",
+  apiPath: "",
+  emptyFilterRoute: "all"
 };
