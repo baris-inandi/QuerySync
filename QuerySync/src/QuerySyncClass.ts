@@ -3,10 +3,6 @@ import { compression } from "./compression";
 import { type EmptyFilters } from "./defaultFilters.svelte";
 import type { JSONSerializable } from "./types/JSONSerializable";
 
-const alphanumericBaseConverter = baseX(
-  "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-);
-
 export class QuerySync<T extends EmptyFilters> {
   filters: T;
   default: T;
@@ -22,6 +18,9 @@ export class QuerySync<T extends EmptyFilters> {
   }
 
   private generateKeybindings() {
+    const alphanumericBaseConverter = baseX(
+      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    );
     const filters = Object.keys(this.filters);
     for (let i = 0; i < filters.length; i++) {
       const shortened = alphanumericBaseConverter.encode([i]);

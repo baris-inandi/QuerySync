@@ -1,11 +1,13 @@
 export interface Options {
-  pagePath: string;
-  apiPath: string;
+  pagePath?: string | (() => string);
+  apiPath?: string | (() => string);
   noFilterString?: string;
+  alphanumericOnlyRoutes?: boolean;
 }
 
 export const DEFAULT_OPTIONS: Options = {
   pagePath: "",
   apiPath: "",
-  noFilterString: "all"
+  noFilterString: "all",
+  alphanumericOnlyRoutes: false
 };
