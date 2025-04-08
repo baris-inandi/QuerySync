@@ -5,11 +5,11 @@
   const tasks = useQuerySync(TasksFilters);
 
   $effect(() => {
-    console.log(tasks.filters.title);
+    console.log(tasks.title);
   });
 </script>
 
 <div>
-  <input class="input" type="text" bind:value={tasks.filters.title} />
-  <input class="input" type="text" bind:value={tasks.filters.sortBy} />
+  <input class="input" type="text" bind:value={tasks.title} />
+  <input class="input" type="text" bind:value={tasks.sortBy} />
 </div>

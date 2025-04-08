@@ -12,25 +12,26 @@ const TEMPLATE_STRING = "{qs}";
 export const useQuerySync = <T extends EmptyFilters>(
   filtersClass: new () => T,
   options: Options = DEFAULT_OPTIONS
-) => {
+): T => {
   const o = { ...DEFAULT_OPTIONS, ...options };
   const qs = new QuerySync<T>(filtersClass);
-  let filtersState = $state(qs.filters);
+  const filtersState = $state({ ...qs.filters });
+
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  onMount(async () => {
+  const initializer = async () => {
     const initialQueryString = page.params.querysync;
     if (initialQueryString && initialQueryString != o.noFilterString) {
       try {
-        await qs.fromString(initialQueryString);
-        filtersState = qs.filters;
+        const filters = await qs.fromString(initialQueryString);
+        Object.assign(filtersState, filters);
       } catch (error) {
         goToQSRoute(o.noFilterString);
       }
     }
     isInitialLoad = false;
-  });
+  };
 
   const goToQSRoute = async (qsString: string) => {
     if (qsString == "") qsString = o.noFilterString;
@@ -52,21 +53,17 @@ export const useQuerySync = <T extends EmptyFilters>(
     }, DEBOUNCE_TIME);
   };
 
-  // We return a proxy to handle changes from the UI
-  return new Proxy(qs, {
+  onMount(initializer);
+
+  return new Proxy(filtersState, {
     get(target, prop, receiver) {
-      if (prop === "filters") {
-        onUpdate();
-        return filtersState;
-      }
+      onUpdate();
+      qs.filters = filtersState;
       return Reflect.get(target, prop, receiver);
     },
     set(target, prop, value, receiver) {
-      if (prop === "filters") {
-        filtersState = value;
-        onUpdate();
-        return true;
-      }
+      onUpdate();
+      qs.filters = filtersState;
       return Reflect.set(target, prop, value, receiver);
     }
   });

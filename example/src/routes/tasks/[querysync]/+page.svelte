@@ -7,9 +7,13 @@
     apiPath: "/api/tasks/{qs}",
     noFilterString: "all",
   });
+
+  $effect(() => {
+    console.log(filters.title);
+  });
 </script>
 
 <div>
-  <input class="input" type="text" bind:value={filters.filters.title} />
-  <input class="input" type="text" bind:value={filters.filters.sortBy} />
+  <input class="input" type="text" bind:value={filters.title} />
+  <input class="input" type="text" bind:value={filters.sortBy} />
 </div>

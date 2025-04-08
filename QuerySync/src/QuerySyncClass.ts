@@ -60,6 +60,7 @@ export class QuerySync<T extends EmptyFilters> {
         }
       }
       this.filters = expanded;
+      return expanded;
     } catch (error) {
       throw new Error("Invalid QuerySync string");
     }
