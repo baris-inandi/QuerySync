@@ -11,7 +11,7 @@ const TEMPLATE_STRING = "{qs}";
 
 export const useQuerySync = <T extends EmptyFilters>(
   filtersClass: new () => T,
-  options: Options
+  options: Options = DEFAULT_OPTIONS
 ) => {
   const o = { ...DEFAULT_OPTIONS, ...options };
   const qs = new QuerySync<T>(filtersClass);
@@ -36,7 +36,10 @@ export const useQuerySync = <T extends EmptyFilters>(
   const goToQSRoute = async (qsString: string) => {
     if (qsString == "") qsString = o.noFilterString;
 
-    const realPath = o.pagePath.replace(TEMPLATE_STRING, qsString);
+    const realPath =
+      typeof o.pagePath === "function"
+        ? o.pagePath()
+        : o.pagePath.replace(TEMPLATE_STRING, qsString);
     console.log("Updating path:", realPath);
     replaceState(realPath, undefined);
   };
