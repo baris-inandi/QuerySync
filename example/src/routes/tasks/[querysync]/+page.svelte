@@ -2,7 +2,7 @@
   import { useQuerySync } from "querysync";
   import { TasksFilters } from "./qs.svelte";
 
-  const filters = useQuerySync(TasksFilters, {
+  const { filters, response } = useQuerySync(TasksFilters, {
     pagePath: "/tasks/{qs}",
     apiPath: "/api/tasks/{qs}",
     noFilterString: "all",
@@ -17,3 +17,9 @@
   <input class="input" type="text" bind:value={filters.title} />
   <input class="input" type="text" bind:value={filters.sortBy} />
 </div>
+
+{#await response}
+  <div>Loading...</div>
+{:then data}
+  <div>{JSON.stringify(data)}</div>
+{/await}

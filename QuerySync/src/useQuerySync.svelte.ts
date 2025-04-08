@@ -9,10 +9,15 @@ import { QuerySync } from "./QuerySyncClass";
 const DEBOUNCE_TIME = 180;
 const TEMPLATE_STRING = "{qs}";
 
+export type UseQuerySyncResult<T extends EmptyFilters> = {
+  filters: T;
+  response: Promise<any>;
+};
+
 export const useQuerySync = <T extends EmptyFilters>(
   filtersClass: new () => T,
   options: Options = DEFAULT_OPTIONS
-): T => {
+): UseQuerySyncResult<T> => {
   const o = { ...DEFAULT_OPTIONS, ...options };
   const qs = new QuerySync<T>(filtersClass);
   const filtersState = $state({ ...qs.filters });
@@ -55,7 +60,7 @@ export const useQuerySync = <T extends EmptyFilters>(
 
   onMount(initializer);
 
-  return new Proxy(filtersState, {
+  const proxy = new Proxy(filtersState, {
     get(target, prop, receiver) {
       onUpdate();
       qs.filters = filtersState;
@@ -67,4 +72,9 @@ export const useQuerySync = <T extends EmptyFilters>(
       return Reflect.set(target, prop, value, receiver);
     }
   });
+
+  return {
+    filters: proxy,
+    response: new Promise(() => {})
+  };
 };
