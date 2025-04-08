@@ -5,7 +5,6 @@ import { onMount } from "svelte";
 import { EmptyFilters } from "./defaultFilters.svelte";
 import { DEFAULT_OPTIONS, type Options } from "./options";
 import { QuerySync } from "./QuerySyncClass";
-
 const DEBOUNCE_TIME = 180;
 const TEMPLATE_STRING = "{qs}";
 
@@ -32,46 +31,51 @@ export const useQuerySync = <T extends EmptyFilters>(
         const filters = await qs.fromString(initialQueryString);
         Object.assign(filtersState, filters);
       } catch (error) {
-        goToQSRoute(o.noFilterString);
+        routes.goToDefaultPage();
       }
     }
     isInitialLoad = false;
   };
 
-  const goToQSRoute = async (qsString: string) => {
-    if (qsString == "") qsString = o.noFilterString;
-
-    const realPath =
-      typeof o.pagePath === "function"
-        ? o.pagePath()
-        : o.pagePath.replace(TEMPLATE_STRING, qsString);
-    replaceState(realPath, undefined);
+  const routes = {
+    resolveTemplateRoute: async (
+      template: string | (() => string),
+      qsString: string
+    ): Promise<string> => {
+      if (qsString == "") qsString = o.noFilterString;
+      return typeof template === "function"
+        ? template()
+        : template.replace(TEMPLATE_STRING, qsString);
+    },
+    goToPage: async (qsString: string) =>
+      replaceState(await routes.resolveTemplateRoute(o.pagePath, qsString), undefined),
+    goToDefaultPage: async () => routes.goToPage(o.noFilterString),
+    resolveAPIUrl: async (qsString: string) => routes.resolveTemplateRoute(o.apiPath, qsString)
   };
 
-  let onUpdate = () => {
+  let onChange = () => {
+    qs.filters = filtersState;
     if (timeoutId !== null) clearTimeout(timeoutId);
     timeoutId = setTimeout(async () => {
       if (!browser || isInitialLoad) return;
       let qsString = await qs.toString();
-      goToQSRoute(qsString);
+      routes.goToPage(qsString);
       timeoutId = null;
     }, DEBOUNCE_TIME);
   };
 
-  onMount(initializer);
-
   const proxy = new Proxy(filtersState, {
     get(target, prop, receiver) {
-      onUpdate();
-      qs.filters = filtersState;
+      onChange();
       return Reflect.get(target, prop, receiver);
     },
     set(target, prop, value, receiver) {
-      onUpdate();
-      qs.filters = filtersState;
+      onChange();
       return Reflect.set(target, prop, value, receiver);
     }
   });
+
+  onMount(initializer);
 
   return {
     filters: proxy,
