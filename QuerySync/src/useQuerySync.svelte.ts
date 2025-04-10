@@ -2,37 +2,43 @@ import { browser } from "$app/environment";
 import { replaceState } from "$app/navigation";
 import { page } from "$app/state";
 import { onMount } from "svelte";
-import { EmptyFilters } from "./defaultFilters.svelte";
+import { EmptyFilters } from "./filters";
 import { DEFAULT_OPTIONS, type Options } from "./options";
-import { QuerySync } from "./QuerySyncClass";
-const DEBOUNCE_TIME = 180;
+import { QuerySync } from "./QuerySync";
+
+const DEBOUNCE_TIME = 250;
 const TEMPLATE_STRING = "{query}";
 
-export type UseQuerySyncResult<T extends EmptyFilters> = {
+export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
   filters: T;
-  response: Promise<any>;
+  response: Promise<U>;
 };
 
-export const useQuerySync = <T extends EmptyFilters>(
-  filtersClass: new () => T,
-  options: Options = DEFAULT_OPTIONS
-): UseQuerySyncResult<T> => {
-  const o = { ...DEFAULT_OPTIONS, ...options };
-  const qs = new QuerySync<T>(filtersClass);
-  const filtersState = $state({ ...qs.filters });
-
+export const useQuerySync = <T extends EmptyFilters, U extends {}>(
+  options: Options<T>
+): UseQuerySyncResult<T, U> => {
+  const o: Options<T> = { ...DEFAULT_OPTIONS, ...options };
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const qs = new QuerySync<T>(o.filters);
+  const filtersState = $state({ ...qs.filters });
+  let response = new Promise<U>(() => {});
+
+  const fetchData = async (qsString: string): Promise<U> => {
+    const apiUrl = await routes.resolveAPIUrl(qsString);
+    return fetch(apiUrl).then((res) => res.json());
+  };
 
   const initializer = async () => {
     const initialQueryString = page.params.querysync;
     if (initialQueryString && initialQueryString != o.noFilterString) {
-      try {
-        const filters = await qs.fromString(initialQueryString);
-        Object.assign(filtersState, filters);
-      } catch (error) {
+      const success = await qs.applyString(initialQueryString);
+      if (!success) {
         routes.goToDefaultPage();
       }
+      Object.assign(filtersState, qs.filters);
+      response = fetchData(initialQueryString);
     }
     isInitialLoad = false;
   };
@@ -61,6 +67,7 @@ export const useQuerySync = <T extends EmptyFilters>(
       let qsString = await qs.toString();
       routes.goToPage(qsString);
       timeoutId = null;
+      response = fetchData(qsString);
     }, DEBOUNCE_TIME);
   };
 
@@ -79,6 +86,6 @@ export const useQuerySync = <T extends EmptyFilters>(
 
   return {
     filters: proxy,
-    response: new Promise(() => {})
+    response
   };
 };

@@ -1,21 +1,21 @@
 <script lang="ts">
   import { useQuerySync } from "querysync";
+  import type { TasksAPIResponse } from "../../api/tasks/[querysync]/+server";
   import { TasksFilters } from "./qs.svelte";
 
-  const { filters, response } = useQuerySync(TasksFilters, {
+  const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>({
+    filters: TasksFilters,
     pagePath: "/tasks/{query}",
     apiPath: "/api/tasks/{query}",
-    noFilterString: "all",
   });
 
   $effect(() => {
-    console.log(filters.title);
+    console.log(response);
   });
 </script>
 
 <div>
   <input class="input" type="text" bind:value={filters.title} />
-  <input class="input" type="text" bind:value={filters.sortBy} />
 </div>
 
 {#await response}

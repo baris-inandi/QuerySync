@@ -1,6 +1,7 @@
 import { json } from "@sveltejs/kit";
 import { QuerySync } from "querysync";
 import { TasksFilters } from "../../../tasks/[querysync]/qs.svelte";
+import { getDummyTasks } from "./dummy";
 
 export interface TasksAPIResponse {
   tasks: {
@@ -12,10 +13,14 @@ export interface TasksAPIResponse {
 }
 
 export async function GET({ params }) {
-  const qs = new QuerySync(TasksFilters);
-  const filters = await qs.fromString(params.querysync);
+  let qs: QuerySync<TasksFilters>;
+  try {
+    qs = await QuerySync.fromString(TasksFilters, params.querysync);
+  } catch (error) {
+    return json({ error: "Invalid QuerySync string " + error }, { status: 400 });
+  }
 
-  const out: TasksAPIResponse = getDummyTasks(filters);
+  const out: TasksAPIResponse = getDummyTasks(qs.filters);
 
   return json(out);
 }
