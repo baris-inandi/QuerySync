@@ -1,12 +1,21 @@
 import { json } from "@sveltejs/kit";
-import { tasksQS } from "../../../tasks/[querysync]/qs.svelte";
+import { QuerySync } from "querysync";
+import { TasksFilters } from "../../../tasks/[querysync]/qs.svelte";
 
-export async function GET({ params }../../[querysync]/$types.js) {
-  const filters = await tasksQS.fromString(params.querysync);
+export interface TasksAPIResponse {
+  tasks: {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+  }[];
+}
 
-  console.log(filters);
+export async function GET({ params }) {
+  const qs = new QuerySync(TasksFilters);
+  const filters = await qs.fromString(params.querysync);
 
-  return json({
-    return: "some data"
-  });
+  const out: TasksAPIResponse = getDummyTasks(filters);
+
+  return json(out);
 }
