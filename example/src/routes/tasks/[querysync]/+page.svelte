@@ -3,8 +3,8 @@
   import { TasksFilters } from "./qs.svelte";
 
   const { filters, response } = useQuerySync(TasksFilters, {
-    pagePath: "/tasks/{qs}",
-    apiPath: "/api/tasks/{qs}",
+    pagePath: "/tasks/{query}",
+    apiPath: "/api/tasks/{query}",
     noFilterString: "all",
   });
 

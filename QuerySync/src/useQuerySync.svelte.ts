@@ -6,7 +6,7 @@ import { EmptyFilters } from "./defaultFilters.svelte";
 import { DEFAULT_OPTIONS, type Options } from "./options";
 import { QuerySync } from "./QuerySyncClass";
 const DEBOUNCE_TIME = 180;
-const TEMPLATE_STRING = "{qs}";
+const TEMPLATE_STRING = "{query}";
 
 export type UseQuerySyncResult<T extends EmptyFilters> = {
   filters: T;
