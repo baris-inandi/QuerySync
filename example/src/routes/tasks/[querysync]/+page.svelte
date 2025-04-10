@@ -1,16 +1,16 @@
 <script lang="ts">
   import { useQuerySync } from "querysync";
   import type { TasksAPIResponse } from "../../api/tasks/[querysync]/+server";
-  import { TasksFilters } from "./qs.svelte";
+  import { TasksFilters, tasksOptions } from "./qs.svelte";
 
-  const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>({
-    filters: TasksFilters,
-    pagePath: "/tasks/{query}",
-    apiPath: "/api/tasks/{query}",
-  });
+  const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>(
+    tasksOptions,
+  );
 
   $effect(() => {
-    console.log(response);
+    response.then((data) => {
+      console.log(data);
+    });
   });
 </script>
 

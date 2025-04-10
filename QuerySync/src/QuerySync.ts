@@ -1,19 +1,20 @@
 import baseX from "base-x";
 import { compression } from "./compression";
 import { type EmptyFilters } from "./filters";
+import { DEFAULT_OPTIONS, Options } from "./options";
 import type { JSONSerializable } from "./types/JSONSerializable";
 
 export class QuerySync<T extends EmptyFilters> {
   filters: T;
   default: T;
-  filtersClass: new () => T;
+  options: Options<T>;
   private shortenerKeybindings: Record<string, string> = {};
   private expanderKeybindings: Record<string, string> = {};
 
-  constructor(filtersClass: new () => T) {
-    this.filtersClass = filtersClass;
-    this.filters = new filtersClass();
-    this.default = new filtersClass();
+  constructor(options: Options<T>) {
+    this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.filters = new this.options.filters();
+    this.default = new this.options.filters();
     this.generateKeybindings();
   }
 
@@ -44,15 +45,19 @@ export class QuerySync<T extends EmptyFilters> {
       }
     }
     if (Object.keys(shortened).length === 0) {
-      return "";
+      return this.options.noFilterString;
     }
     return compression.compress(shortened as JSONSerializable);
   }
 
   async applyString(query: string) {
+    if (query === this.options.noFilterString) {
+      this.filters = new this.options.filters();
+      return true;
+    }
     try {
       const shortened: Record<string, any> = await compression.decompress(query);
-      const expanded: T = new this.filtersClass();
+      const expanded: T = new this.options.filters();
       for (const key in shortened) {
         const expandedKey = this.expanderKeybindings[key];
         if (expandedKey) {
@@ -66,8 +71,8 @@ export class QuerySync<T extends EmptyFilters> {
     }
   }
 
-  static async fromString<T extends EmptyFilters>(filtersClass: new () => T, query: string) {
-    const qs = new QuerySync(filtersClass);
+  static async fromString<T extends EmptyFilters>(options: Options<T>, query: string) {
+    const qs = new QuerySync(options);
     await qs.applyString(query);
     return qs;
   }

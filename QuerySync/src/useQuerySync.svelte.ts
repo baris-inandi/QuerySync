@@ -21,11 +21,11 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  const qs = new QuerySync<T>(o.filters);
+  const qs = new QuerySync<T>(o);
   const filtersState = $state({ ...qs.filters });
-  let response = new Promise<U>(() => {});
+  let response: Promise<Awaited<U>> = Promise.resolve({} as Awaited<U>);
 
-  const fetchData = async (qsString: string): Promise<U> => {
+  const fetchData = async (qsString: string): Promise<Awaited<U>> => {
     const apiUrl = await routes.resolveAPIUrl(qsString);
     return fetch(apiUrl).then((res) => res.json());
   };
