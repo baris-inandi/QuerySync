@@ -8,13 +8,13 @@ import { QuerySyncBuilder } from "./QuerySync";
 const DEBOUNCE_TIME = 300;
 const TEMPLATE_STRING = "[querysync]";
 
-export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
+export type UseQuerySyncResult<T extends EmptyFilters, U extends { filters: any }> = {
   filters: T;
   defaultFilters: T;
   response: Promise<U>;
 };
 
-export const useQuerySync = <T extends EmptyFilters, U extends {}>(
+export const useQuerySync = <T extends EmptyFilters, U extends { filters: any }>(
   qsBuilder: QuerySyncBuilder<T>
 ): UseQuerySyncResult<T, U> => {
   const qs = qsBuilder();

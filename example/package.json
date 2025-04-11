@@ -35,7 +35,6 @@
   "type": "module",
   "module": "index.ts",
   "dependencies": {
-    "fuse.js": "^7.1.0",
     "querysync": "../QuerySync"
   }
 }

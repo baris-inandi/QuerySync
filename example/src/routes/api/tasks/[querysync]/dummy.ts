@@ -1,4 +1,3 @@
-import Fuse from "fuse.js";
 import type { TasksFilters } from "../../../tasks/[querysync]/qs.svelte";
 import type { TasksAPIResponse } from "./+server";
 
@@ -207,17 +206,23 @@ const DUMMY_TASKS = [
 ];
 
 export const getDummyTasks = (filters: TasksFilters): TasksAPIResponse => {
-  const fuse = new Fuse(DUMMY_TASKS, {
-    keys: ["title", "description", "completed"]
-  });
+  let filteredTasks = [...DUMMY_TASKS];
 
-  const out = fuse.search({
-    title: filters.title,
-    description: filters.description,
-    completed: filters.completed ? "true" : "false"
-  });
+  if (filters.title) {
+    const titleLower = filters.title.toLowerCase();
+    filteredTasks = filteredTasks.filter((task) => task.title.toLowerCase().includes(titleLower));
+  }
+
+  if (filters.description) {
+    const descLower = filters.description.toLowerCase();
+    filteredTasks = filteredTasks.filter((task) =>
+      task.description.toLowerCase().includes(descLower)
+    );
+  }
+
+  filteredTasks = filteredTasks.filter((task) => task.completed === filters.completed);
 
   return {
-    tasks: DUMMY_TASKS
+    tasks: filteredTasks
   };
 };
