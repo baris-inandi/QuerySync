@@ -1,6 +1,9 @@
 import { EmptyFilters, TabularFilters } from "./src/filters";
+import { handleQuerySync } from "./src/handleQuerySync";
 import type { Options } from "./src/options";
-import { QuerySync } from "./src/QuerySync";
+import { querySync } from "./src/QuerySync";
 import { useQuerySync } from "./src/useQuerySync.svelte";
 
-export { EmptyFilters, QuerySync, Options as QuerySyncOptions, TabularFilters, useQuerySync };
+export { handleQuerySync, querySync, useQuerySync };
+
+export { EmptyFilters, Options as QuerySyncOptions, TabularFilters };

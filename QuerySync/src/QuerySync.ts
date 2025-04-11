@@ -4,6 +4,11 @@ import { type EmptyFilters } from "./filters";
 import { DEFAULT_OPTIONS, Options } from "./options";
 import type { JSONSerializable } from "./types/JSONSerializable";
 
+export type QuerySyncBuilder<T extends EmptyFilters> = () => QuerySync<T>;
+export function querySync<T extends EmptyFilters>(options: Options<T>): QuerySyncBuilder<T> {
+  return () => new QuerySync<T>(options);
+}
+
 export class QuerySync<T extends EmptyFilters> {
   filters: T;
   default: T;
@@ -13,8 +18,8 @@ export class QuerySync<T extends EmptyFilters> {
 
   constructor(options: Options<T>) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.filters = new this.options.filters();
-    this.default = new this.options.filters();
+    this.filters = new this.options.Filters();
+    this.default = new this.options.Filters();
     this.generateKeybindings();
   }
 
@@ -50,14 +55,14 @@ export class QuerySync<T extends EmptyFilters> {
     return compression.compress(shortened as JSONSerializable);
   }
 
-  async applyString(query: string) {
-    if (query === this.options.noFilterString) {
-      this.filters = new this.options.filters();
+  async applyString(queryString: string) {
+    if (queryString === this.options.noFilterString) {
+      this.filters = new this.options.Filters();
       return true;
     }
     try {
-      const shortened: Record<string, any> = await compression.decompress(query);
-      const expanded: T = new this.options.filters();
+      const shortened: Record<string, any> = await compression.decompress(queryString);
+      const expanded: T = new this.options.Filters();
       for (const key in shortened) {
         const expandedKey = this.expanderKeybindings[key];
         if (expandedKey) {
@@ -69,11 +74,5 @@ export class QuerySync<T extends EmptyFilters> {
     } catch (error) {
       return false;
     }
-  }
-
-  static async fromString<T extends EmptyFilters>(options: Options<T>, query: string) {
-    const qs = new QuerySync(options);
-    await qs.applyString(query);
-    return qs;
   }
 }

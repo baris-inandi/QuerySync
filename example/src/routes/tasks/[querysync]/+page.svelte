@@ -1,10 +1,10 @@
 <script lang="ts">
   import { useQuerySync } from "querysync";
   import type { TasksAPIResponse } from "../../api/tasks/[querysync]/+server";
-  import { TasksFilters, tasksOptions } from "./qs.svelte";
+  import { tasksQs, type TasksFilters } from "./qs.svelte";
 
   const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>(
-    tasksOptions,
+    tasksQs,
   );
 
   $effect(() => {
