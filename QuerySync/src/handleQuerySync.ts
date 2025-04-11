@@ -1,4 +1,3 @@
-import { page } from "$app/state";
 import { EmptyFilters } from "./filters";
 import { QuerySyncBuilder } from "./QuerySync";
 
@@ -9,10 +8,11 @@ export type HandleQuerySyncResult<T extends EmptyFilters> = {
 };
 
 export const handleQuerySync = async <T extends EmptyFilters>(
-  qsBuilder: QuerySyncBuilder<T>
+  qsBuilder: QuerySyncBuilder<T>,
+  queryString: string
 ): Promise<HandleQuerySyncResult<T>> => {
   const qs = qsBuilder();
-  const valid = await qs.applyString(page.params.querysync);
+  const valid = await qs.applyString(queryString);
 
   return {
     valid,

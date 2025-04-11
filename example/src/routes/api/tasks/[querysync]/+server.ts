@@ -12,8 +12,8 @@ export interface TasksAPIResponse {
   }[];
 }
 
-export async function GET() {
-  const { valid, filters } = await handleQuerySync(tasksQs);
+export async function GET({ params }) {
+  const { valid, filters } = await handleQuerySync(tasksQs, params.querysync);
 
   if (!valid) {
     return json({ error: "Invalid QuerySync string" }, { status: 400 });
