@@ -8,24 +8,27 @@ import { QuerySyncBuilder } from "./QuerySync";
 const DEBOUNCE_TIME = 300;
 const TEMPLATE_STRING = "[querysync]";
 
-export type UseQuerySyncResult<T extends EmptyFilters, U extends { filters: any }> = {
+export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
   filters: T;
   defaultFilters: T;
   response: Promise<U>;
 };
 
-export const useQuerySync = <T extends EmptyFilters, U extends { filters: any }>(
+export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   qsBuilder: QuerySyncBuilder<T>
 ): UseQuerySyncResult<T, U> => {
   const qs = qsBuilder();
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   const filtersState = $state({ ...qs.filters });
-  let response: Promise<Awaited<U>> = Promise.resolve({} as Awaited<U>);
+  let response: Promise<U> = Promise.resolve({} as Promise<U>);
 
-  const fetchData = async (qsString: string): Promise<Awaited<U>> => {
+  const fetchData = async (qsString: string): Promise<U> => {
     const apiUrl = await routes.resolveAPIUrl(qsString);
-    return fetch(apiUrl).then((res) => res.json());
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    console.log("data", data);
+    return data;
   };
 
   const initializer = async () => {

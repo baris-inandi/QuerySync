@@ -11,7 +11,7 @@ export function querySync<T extends EmptyFilters>(options: Options<T>): QuerySyn
 
 export class QuerySync<T extends EmptyFilters> {
   filters: T;
-  default: T;
+  default: Readonly<T>;
   options: Options<T>;
   private shortenerKeybindings: Record<string, string> = {};
   private expanderKeybindings: Record<string, string> = {};
@@ -21,6 +21,7 @@ export class QuerySync<T extends EmptyFilters> {
     this.filters = new this.options.Filters();
     this.default = new this.options.Filters();
     this.generateKeybindings();
+    console.log(this);
   }
 
   private generateKeybindings() {
