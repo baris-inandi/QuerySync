@@ -21,7 +21,6 @@ export class QuerySync<T extends EmptyFilters> {
     this.filters = new this.options.Filters();
     this.default = new this.options.Filters();
     this.generateKeybindings();
-    console.log(this);
   }
 
   private generateKeybindings() {

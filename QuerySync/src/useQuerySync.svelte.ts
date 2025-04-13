@@ -42,7 +42,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   const fetchData = async (qsString: string): Promise<U> => {
     const apiUrl = await routes.resolveAPIUrl(qsString);
     const res = await fetch(apiUrl);
-    return res.json();
+    const resJson = res.json();
+    response = resJson;
+    return resJson;
   };
 
   const initializer = async () => {
