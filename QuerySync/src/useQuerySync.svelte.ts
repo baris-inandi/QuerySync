@@ -41,6 +41,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   };
 
   const fetchData = async (queryString: string): Promise<U> => {
+    if (qs.options.apiFetcher) {
+      return await qs.options.apiFetcher(filtersState);
+    }
     const url = await routes.resolveAPIUrl(queryString);
     const response = await fetch(url);
     return await response.json();

@@ -5,11 +5,13 @@ export interface Options<T extends EmptyFilters> {
   pagePath?: string | (() => string);
   apiPath?: string | (() => string);
   noFilterString?: string;
+  apiFetcher?: (filters: T) => Promise<any>;
 }
 
 export const DEFAULT_OPTIONS: Options<EmptyFilters> = {
   pagePath: "",
   apiPath: "",
   noFilterString: "all",
-  filters: EmptyFilters
+  filters: EmptyFilters,
+  apiFetcher: undefined
 };
