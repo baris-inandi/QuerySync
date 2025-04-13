@@ -5,7 +5,7 @@ import { DEFAULT_OPTIONS, Options } from "./options";
 import type { JSONSerializable } from "./types/JSONSerializable";
 
 export type QuerySyncBuilder<T extends EmptyFilters> = () => QuerySync<T>;
-export function querySync<T extends EmptyFilters>(options: Options<T>): QuerySyncBuilder<T> {
+export function defineQuerySync<T extends EmptyFilters>(options: Options<T>): QuerySyncBuilder<T> {
   return () => new QuerySync<T>(options);
 }
 

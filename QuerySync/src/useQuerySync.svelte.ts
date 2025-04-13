@@ -25,22 +25,22 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   const routes = {
     resolveTemplateRoute: async (
       template: string | (() => string),
-      qsString: string
+      queryString: string
     ): Promise<string> => {
-      if (qsString == "") qsString = qs.options.noFilterString;
+      if (queryString == "") queryString = qs.options.noFilterString;
       return typeof template === "function"
         ? template()
-        : template.replace(TEMPLATE_STRING, qsString);
+        : template.replace(TEMPLATE_STRING, queryString);
     },
-    goToPage: async (qsString: string) =>
-      replaceState(await routes.resolveTemplateRoute(qs.options.pagePath, qsString), undefined),
+    goToPage: async (queryString: string) =>
+      replaceState(await routes.resolveTemplateRoute(qs.options.pagePath, queryString), undefined),
     goToDefaultPage: async () => routes.goToPage(qs.options.noFilterString),
-    resolveAPIUrl: async (qsString: string) =>
-      routes.resolveTemplateRoute(qs.options.apiPath, qsString)
+    resolveAPIUrl: async (queryString: string) =>
+      routes.resolveTemplateRoute(qs.options.apiPath, queryString)
   };
 
-  const fetchData = async (qsString: string): Promise<U> => {
-    const url = await routes.resolveAPIUrl(qsString);
+  const fetchData = async (queryString: string): Promise<U> => {
+    const url = await routes.resolveAPIUrl(queryString);
     const response = await fetch(url);
     return await response.json();
   };
@@ -67,9 +67,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
     if (timeoutId !== null) clearTimeout(timeoutId);
     timeoutId = setTimeout(async () => {
       if (!browser || isInitialLoad) return;
-      let qsString = await qs.toString();
-      routes.goToPage(qsString);
-      response.value = fetchData(qsString);
+      let queryString = await qs.toString();
+      routes.goToPage(queryString);
+      response.value = fetchData(queryString);
       timeoutId = null;
     }, DEBOUNCE_TIME);
   };
