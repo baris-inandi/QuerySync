@@ -1,6 +1,5 @@
 import { browser } from "$app/environment";
 import { replaceState } from "$app/navigation";
-import { page } from "$app/state";
 import { onMount } from "svelte";
 import { EmptyFilters } from "./filters";
 import { QuerySyncBuilder } from "./QuerySync";
@@ -15,12 +14,14 @@ export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
 };
 
 export const useQuerySync = <T extends EmptyFilters, U extends {}>(
-  qsBuilder: QuerySyncBuilder<T>
+  qsBuilder: QuerySyncBuilder<T>,
+  initialQueryString?: string
 ): UseQuerySyncResult<T, U> => {
   const qs = qsBuilder();
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   const filtersState = $state({ ...qs.filters });
+  const _initialQueryString = initialQueryString ?? qs.options.noFilterString;
 
   const routes = {
     resolveTemplateRoute: async (
@@ -50,10 +51,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   });
 
   const initializer = async () => {
-    const initialQueryString = page.params.querysync;
-    if (initialQueryString && initialQueryString != qs.options.noFilterString) {
+    if (_initialQueryString && _initialQueryString != qs.options.noFilterString) {
       try {
-        await qs.applyString(initialQueryString);
+        await qs.applyString(_initialQueryString);
       } catch (error) {
         routes.goToDefaultPage();
       }

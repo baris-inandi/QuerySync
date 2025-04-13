@@ -1,4 +1,4 @@
-import { querySync, TabularFilters } from "querysync";
+import { defineQuerySync, TabularFilters } from "querysync";
 
 export class TasksFilters extends TabularFilters {
   title = "";
@@ -6,7 +6,7 @@ export class TasksFilters extends TabularFilters {
   completedOnly = false;
 }
 
-export const tasksQs = querySync({
+export const tasksQs = defineQuerySync({
   filters: TasksFilters,
   pagePath: "/tasks/{query}",
   apiPath: "/api/tasks/{query}"

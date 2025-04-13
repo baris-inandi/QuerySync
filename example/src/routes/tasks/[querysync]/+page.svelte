@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import { useQuerySync } from "querysync";
   import type { TasksAPIResponse } from "../../api/tasks/[querysync]/+server";
   import { tasksQs, type TasksFilters } from "./qs.svelte";
@@ -6,6 +7,7 @@
 
   const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>(
     tasksQs,
+    page.params.querysync,
   );
 </script>
 
