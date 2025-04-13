@@ -21,28 +21,6 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   let isInitialLoad = true;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   const filtersState = $state({ ...qs.filters });
-  let response: Promise<U> = Promise.resolve({} as Promise<U>);
-
-  const fetchData = async (qsString: string): Promise<U> => {
-    const apiUrl = await routes.resolveAPIUrl(qsString);
-    const res = await fetch(apiUrl);
-    const data = await res.json();
-    console.log("data", data);
-    return data;
-  };
-
-  const initializer = async () => {
-    const initialQueryString = page.params.querysync;
-    if (initialQueryString && initialQueryString != qs.options.noFilterString) {
-      const valid = await qs.applyString(initialQueryString);
-      if (!valid) {
-        routes.goToDefaultPage();
-      }
-      Object.assign(filtersState, qs.filters);
-      response = fetchData(initialQueryString);
-    }
-    isInitialLoad = false;
-  };
 
   const routes = {
     resolveTemplateRoute: async (
@@ -61,6 +39,25 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
       routes.resolveTemplateRoute(qs.options.apiPath, qsString)
   };
 
+  const fetchData = async (qsString: string): Promise<U> => {
+    const apiUrl = await routes.resolveAPIUrl(qsString);
+    const res = await fetch(apiUrl);
+    return res.json();
+  };
+
+  const initializer = async () => {
+    const initialQueryString = page.params.querysync;
+    if (initialQueryString && initialQueryString != qs.options.noFilterString) {
+      const valid = await qs.applyString(initialQueryString);
+      if (!valid) {
+        routes.goToDefaultPage();
+      }
+      Object.assign(filtersState, qs.filters);
+      fetchData(initialQueryString);
+    }
+    isInitialLoad = false;
+  };
+
   let onChange = () => {
     qs.filters = filtersState;
     if (timeoutId !== null) clearTimeout(timeoutId);
@@ -69,7 +66,7 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
       let qsString = await qs.toString();
       routes.goToPage(qsString);
       timeoutId = null;
-      response = fetchData(qsString);
+      fetchData(qsString);
     }, DEBOUNCE_TIME);
   };
 
@@ -85,6 +82,7 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   });
 
   onMount(initializer);
+  let response: Promise<U> = $state(fetchData(page.params.querysync));
 
   return {
     filters: proxy,
