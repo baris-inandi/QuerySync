@@ -18,8 +18,8 @@ export class QuerySync<T extends EmptyFilters> {
 
   constructor(options: Options<T>) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.filters = new this.options.Filters();
-    this.default = new this.options.Filters();
+    this.filters = new this.options.filters();
+    this.default = new this.options.filters();
     this.generateKeybindings();
   }
 
@@ -57,22 +57,18 @@ export class QuerySync<T extends EmptyFilters> {
 
   async applyString(queryString: string) {
     if (queryString === this.options.noFilterString) {
-      this.filters = new this.options.Filters();
-      return true;
+      this.filters = new this.options.filters();
+      return this;
     }
-    try {
-      const shortened: Record<string, any> = await compression.decompress(queryString);
-      const expanded: T = new this.options.Filters();
-      for (const key in shortened) {
-        const expandedKey = this.expanderKeybindings[key];
-        if (expandedKey) {
-          (expanded[expandedKey] as Record<string, any>) = shortened[key];
-        }
+    const shortened: Record<string, any> = await compression.decompress(queryString);
+    const expanded: T = new this.options.filters();
+    for (const key in shortened) {
+      const expandedKey = this.expanderKeybindings[key];
+      if (expandedKey) {
+        (expanded[expandedKey] as Record<string, any>) = shortened[key];
       }
-      this.filters = expanded;
-      return true;
-    } catch (error) {
-      return false;
     }
+    this.filters = expanded;
+    return this;
   }
 }

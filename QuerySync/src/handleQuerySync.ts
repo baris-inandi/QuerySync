@@ -1,22 +1,11 @@
 import { EmptyFilters } from "./filters";
-import { QuerySyncBuilder } from "./QuerySync";
-
-export type HandleQuerySyncResult<T extends EmptyFilters> = {
-  valid: boolean;
-  filters: T;
-  defaultFilters: T;
-};
+import { QuerySync, QuerySyncBuilder } from "./QuerySync";
 
 export const handleQuerySync = async <T extends EmptyFilters>(
   qsBuilder: QuerySyncBuilder<T>,
   queryString: string
-): Promise<HandleQuerySyncResult<T>> => {
+): Promise<QuerySync<T>> => {
   const qs = qsBuilder();
-  const valid = await qs.applyString(queryString);
 
-  return {
-    valid,
-    filters: qs.filters,
-    defaultFilters: qs.default
-  };
+  return await qs.applyString(queryString);
 };

@@ -2,7 +2,7 @@ import baseX from "base-x";
 import { deflate, inflate } from "pako";
 import type { JSONSerializable } from "./types/JSONSerializable";
 
-const baseConverter = baseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.!");
+const baseConverter = baseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.");
 
 export const compression = {
   compress: async (stringifyable: JSONSerializable): Promise<string> => {
@@ -19,16 +19,23 @@ export const compression = {
   },
 
   decompress: async <T>(encodedString: string): Promise<T> => {
-    const compressed = baseConverter.decode(encodedString);
-
-    const decompressed = await new Promise<Uint8Array>((resolve) => {
-      Promise.resolve().then(() => {
-        const result = inflate(compressed);
-        resolve(result);
+    const FAIL_MSG = "Failed to decompress query string";
+    try {
+      const compressed = baseConverter.decode(encodedString);
+      const decompressed = await new Promise<Uint8Array>((resolve, reject) => {
+        Promise.resolve().then(() => {
+          try {
+            const result = inflate(compressed);
+            resolve(result);
+          } catch (error) {
+            reject(new Error(FAIL_MSG));
+          }
+        });
       });
-    });
-
-    const jsonStr = new TextDecoder().decode(decompressed);
-    return JSON.parse(jsonStr) as T;
+      const jsonStr = new TextDecoder().decode(decompressed);
+      return JSON.parse(jsonStr) as T;
+    } catch (error) {
+      throw new Error(FAIL_MSG);
+    }
   }
 };

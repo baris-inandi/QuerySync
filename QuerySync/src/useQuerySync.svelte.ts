@@ -7,7 +7,7 @@ import { EmptyFilters } from "./filters";
 import { QuerySyncBuilder } from "./QuerySync";
 
 const DEBOUNCE_TIME = 300;
-const TEMPLATE_STRING = "[querysync]";
+const TEMPLATE_STRING = "{query}";
 
 export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
   filters: T;
@@ -51,8 +51,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   const initializer = async () => {
     const initialQueryString = page.params.querysync;
     if (initialQueryString && initialQueryString != qs.options.noFilterString) {
-      const valid = await qs.applyString(initialQueryString);
-      if (!valid) {
+      try {
+        await qs.applyString(initialQueryString);
+      } catch (error) {
         routes.goToDefaultPage();
       }
       Object.assign(filtersState, qs.filters);

@@ -13,13 +13,11 @@ export interface TasksAPIResponse {
 }
 
 export async function GET({ params }) {
-  const { valid, filters } = await handleQuerySync(tasksQs, params.querysync);
-
-  if (!valid) {
-    return json({ error: "Invalid QuerySync string" }, { status: 400 });
+  try {
+    const qs = await handleQuerySync(tasksQs, params.querysync);
+    return json(getDummyTasks(qs.filters), { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return json({ error: "Invalid or malformed query string" }, { status: 400 });
   }
-
-  const out: TasksAPIResponse = getDummyTasks(filters);
-
-  return json(out);
 }

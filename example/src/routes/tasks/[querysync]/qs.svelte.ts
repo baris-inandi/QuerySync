@@ -7,7 +7,7 @@ export class TasksFilters extends TabularFilters {
 }
 
 export const tasksQs = querySync({
-  Filters: TasksFilters,
-  pagePath: "/tasks/[querysync]",
-  apiPath: "/api/tasks/[querysync]"
+  filters: TasksFilters,
+  pagePath: "/tasks/{query}",
+  apiPath: "/api/tasks/{query}"
 });
