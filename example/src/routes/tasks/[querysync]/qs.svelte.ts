@@ -3,7 +3,7 @@ import { querySync, TabularFilters } from "querysync";
 export class TasksFilters extends TabularFilters {
   title = "";
   description = "";
-  completed = false;
+  completedOnly = false;
 }
 
 export const tasksQs = querySync({

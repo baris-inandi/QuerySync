@@ -2,6 +2,7 @@
   import { useQuerySync } from "querysync";
   import type { TasksAPIResponse } from "../../api/tasks/[querysync]/+server";
   import { tasksQs, type TasksFilters } from "./qs.svelte";
+  import Task from "./Task.svelte";
 
   const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>(
     tasksQs,
@@ -32,7 +33,7 @@
     <input
       class="checkbox checkbox-sm"
       type="checkbox"
-      bind:checked={filters.completed}
+      bind:checked={filters.completedOnly}
     />
   </label>
 </div>
@@ -42,15 +43,9 @@
     <div class="loading">Loading...</div>
   {:then data}
     {#if data.tasks && data.tasks.length > 0}
-      <div class="mt-4">
-        {#each data.tasks as task}
-          <div class="p-4 border border-gray-200 mb-2 rounded-md">
-            <h3>{task.title}</h3>
-            <p>{task.description}</p>
-            <input class="checkbox" type="checkbox" checked={task.completed} />
-          </div>
-        {/each}
-      </div>
+      {#each data.tasks as task}
+        <Task {task} />
+      {/each}
     {:else}
       <div>No tasks found</div>
     {/if}

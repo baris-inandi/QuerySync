@@ -1,12 +1,11 @@
 import { browser } from "$app/environment";
 import { replaceState } from "$app/navigation";
 import { page } from "$app/state";
-import ky from "ky";
 import { onMount } from "svelte";
 import { EmptyFilters } from "./filters";
 import { QuerySyncBuilder } from "./QuerySync";
 
-const DEBOUNCE_TIME = 300;
+const DEBOUNCE_TIME = 250;
 const TEMPLATE_STRING = "{query}";
 
 export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
@@ -41,7 +40,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   };
 
   const fetchData = async (qsString: string): Promise<U> => {
-    return await ky.get(await routes.resolveAPIUrl(qsString)).json();
+    const url = await routes.resolveAPIUrl(qsString);
+    const response = await fetch(url);
+    return await response.json();
   };
 
   let response = $state({

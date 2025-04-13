@@ -220,7 +220,9 @@ export const getDummyTasks = (filters: TasksFilters): TasksAPIResponse => {
     );
   }
 
-  filteredTasks = filteredTasks.filter((task) => task.completed === filters.completed);
+  filteredTasks = filters.completedOnly
+    ? filteredTasks.filter((task) => task.completed)
+    : filteredTasks;
 
   return {
     tasks: filteredTasks
