@@ -17,7 +17,7 @@
   />
 </div>
 
-{#await response}
+{#await response.value}
   <div class="loading">Loading...</div>
 {:then data}
   {#if data.tasks && data.tasks.length > 0}

@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import { replaceState } from "$app/navigation";
 import { page } from "$app/state";
+import ky from "ky";
 import { onMount } from "svelte";
 import { EmptyFilters } from "./filters";
 import { QuerySyncBuilder } from "./QuerySync";
@@ -11,7 +12,7 @@ const TEMPLATE_STRING = "[querysync]";
 export type UseQuerySyncResult<T extends EmptyFilters, U extends {}> = {
   filters: T;
   defaultFilters: T;
-  response: Promise<U>;
+  response: { value: Promise<U> };
 };
 
 export const useQuerySync = <T extends EmptyFilters, U extends {}>(
@@ -40,12 +41,12 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   };
 
   const fetchData = async (qsString: string): Promise<U> => {
-    const apiUrl = await routes.resolveAPIUrl(qsString);
-    const res = await fetch(apiUrl);
-    const resJson = res.json();
-    response = resJson;
-    return resJson;
+    return await ky.get(await routes.resolveAPIUrl(qsString)).json();
   };
+
+  let response = $state({
+    value: new Promise<U>(() => {})
+  });
 
   const initializer = async () => {
     const initialQueryString = page.params.querysync;
@@ -55,7 +56,6 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
         routes.goToDefaultPage();
       }
       Object.assign(filtersState, qs.filters);
-      fetchData(initialQueryString);
     }
     isInitialLoad = false;
   };
@@ -67,12 +67,12 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
       if (!browser || isInitialLoad) return;
       let qsString = await qs.toString();
       routes.goToPage(qsString);
+      response.value = fetchData(qsString);
       timeoutId = null;
-      fetchData(qsString);
     }, DEBOUNCE_TIME);
   };
 
-  const proxy = new Proxy(filtersState, {
+  const filtersProxy = new Proxy(filtersState, {
     get(target, prop, receiver) {
       onChange();
       return Reflect.get(target, prop, receiver);
@@ -84,10 +84,9 @@ export const useQuerySync = <T extends EmptyFilters, U extends {}>(
   });
 
   onMount(initializer);
-  let response: Promise<U> = $state(fetchData(page.params.querysync));
 
   return {
-    filters: proxy,
+    filters: filtersProxy,
     defaultFilters: qs.default,
     response
   };
