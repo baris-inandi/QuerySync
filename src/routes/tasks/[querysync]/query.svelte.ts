@@ -1,4 +1,4 @@
-import { defineQuerySync } from '../../../lib/defineQuerySync';
+import { QuerySync } from '../../../lib/QuerySync.svelte';
 import { TabularFilters } from '../../../lib/utils/filters';
 
 export class TasksFilters extends TabularFilters {
@@ -7,7 +7,7 @@ export class TasksFilters extends TabularFilters {
 	completedOnly = false;
 }
 
-export const tasksQs = defineQuerySync({
+export const tasksQs = new QuerySync({
 	filters: TasksFilters,
 	pagePath: '/tasks/{query}',
 	apiPath: '/api/tasks/{query}'

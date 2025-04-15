@@ -1,5 +1,5 @@
-import type { TasksFilters } from "../../../tasks/[querysync]/qs.svelte";
-import type { TasksAPIResponse } from "./+server.js";
+import type { TasksFilters } from '../../../tasks/[querysync]/query.svelte';
+import type { TasksAPIResponse } from './+server.js';
 
 // prettier-ignore
 const DUMMY_TASKS = [
@@ -206,25 +206,25 @@ const DUMMY_TASKS = [
 ];
 
 export const getDummyTasks = (filters: TasksFilters): TasksAPIResponse => {
-  let filteredTasks = [...DUMMY_TASKS];
+	let filteredTasks = [...DUMMY_TASKS];
 
-  if (filters.title) {
-    const titleLower = filters.title.toLowerCase();
-    filteredTasks = filteredTasks.filter((task) => task.title.toLowerCase().includes(titleLower));
-  }
+	if (filters.title) {
+		const titleLower = filters.title.toLowerCase();
+		filteredTasks = filteredTasks.filter((task) => task.title.toLowerCase().includes(titleLower));
+	}
 
-  if (filters.description) {
-    const descLower = filters.description.toLowerCase();
-    filteredTasks = filteredTasks.filter((task) =>
-      task.description.toLowerCase().includes(descLower)
-    );
-  }
+	if (filters.description) {
+		const descLower = filters.description.toLowerCase();
+		filteredTasks = filteredTasks.filter((task) =>
+			task.description.toLowerCase().includes(descLower)
+		);
+	}
 
-  filteredTasks = filters.completedOnly
-    ? filteredTasks.filter((task) => task.completed)
-    : filteredTasks;
+	filteredTasks = filters.completedOnly
+		? filteredTasks.filter((task) => task.completed)
+		: filteredTasks;
 
-  return {
-    tasks: filteredTasks
-  };
+	return {
+		tasks: filteredTasks
+	};
 };

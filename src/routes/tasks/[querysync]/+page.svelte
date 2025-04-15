@@ -1,14 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { useQuerySync } from '../../../lib/useQuerySync.svelte';
-	import type { TasksAPIResponse } from '../../api/tasks/[querysync]/+server.js';
-	import { tasksQs, type TasksFilters } from './qs.svelte';
+	import type { TasksAPIResponse } from '../../api/tasks/[querysync]/+server';
+	import { tasksQs } from './query.svelte';
 	import Task from './Task.svelte';
 
-	const { filters, response } = useQuerySync<TasksFilters, TasksAPIResponse>(
-		tasksQs,
-		page.params.querysync
-	);
+	const response = useQuerySync<TasksAPIResponse>(tasksQs);
 </script>
 
 <div class="flex flex-col gap-2 p-4 pb-6">
@@ -17,7 +13,7 @@
 		<input
 			class="input input-sm"
 			type="text"
-			bind:value={filters.title}
+			bind:value={tasksQs.filters.title}
 			placeholder="Search title..."
 		/>
 	</label>
@@ -26,13 +22,17 @@
 		<input
 			class="input input-sm"
 			type="text"
-			bind:value={filters.description}
+			bind:value={tasksQs.filters.description}
 			placeholder="Search description..."
 		/>
 	</label>
 	<label class="label">
 		<span>Completed only?</span>
-		<input class="checkbox checkbox-sm" type="checkbox" bind:checked={filters.completedOnly} />
+		<input
+			class="checkbox checkbox-sm"
+			type="checkbox"
+			bind:checked={tasksQs.filters.completedOnly}
+		/>
 	</label>
 </div>
 
