@@ -9,10 +9,10 @@ export interface Options<T extends EmptyFilters> {
 }
 
 export const DEFAULT_OPTIONS: Options<EmptyFilters> = {
+	filters: EmptyFilters,
 	pagePath: '',
 	apiPath: '',
 	noFilterString: 'all',
-	filters: EmptyFilters,
 	apiFetcher: undefined
 };
 

@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { tasksQs } from './query.svelte';
+	import { tasksQs } from './tasksQs';
 	import Task from './Task.svelte';
+
+	$effect(() => {
+		console.log(tasksQs.filters.title);
+	});
 </script>
 
 <div class="flex flex-col gap-2 p-4 pb-6">

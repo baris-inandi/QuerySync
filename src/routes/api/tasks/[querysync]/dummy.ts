@@ -1,4 +1,4 @@
-import type { TasksFilters } from '../../../tasks/[querysync]/query.svelte';
+import type { TasksFilters } from '../../../tasks/[querysync]/tasksQs';
 import type { TasksAPIResponse } from './+server.js';
 
 // prettier-ignore

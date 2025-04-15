@@ -8,12 +8,13 @@ import { completeOptions, type Options } from './utils/options.js';
 import { Routes } from './utils/routes';
 
 export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
+	/* Public Properties */
 	filters: T;
 	defaultFilters: Readonly<T>;
 	options: Required<Options<T>>;
 	response = $state({ value: new Promise<APIResponse>(() => {}) });
 
-	/* Internal Properties */
+	/* Private Properties */
 	private readonly routes = new Routes(this);
 	private timeoutId: ReturnType<typeof setTimeout> | null = null;
 	private memo: Record<string, APIResponse> = {};
@@ -51,7 +52,7 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 		return result;
 	}
 
-	private hook() {
+	private onChange() {
 		if (this.timeoutId !== null) clearTimeout(this.timeoutId);
 		this.timeoutId = setTimeout(async () => {
 			if (!browser) return;
@@ -72,7 +73,7 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 				const oldValue = Reflect.get(target, prop, receiver);
 				const result = Reflect.set(target, prop, value, receiver);
 				if (oldValue !== value) {
-					this.hook();
+					this.onChange();
 				}
 				return result;
 			}

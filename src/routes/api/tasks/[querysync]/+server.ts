@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { tasksQs } from '../../../tasks/[querysync]/query.svelte';
+import { tasksQs } from '../../../tasks/[querysync]/tasksQs';
 import { getDummyTasks } from './dummy.js';
 
 export interface TasksAPIResponse {
