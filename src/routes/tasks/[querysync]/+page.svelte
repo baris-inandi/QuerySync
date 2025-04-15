@@ -1,10 +1,6 @@
 <script lang="ts">
-	import { useQuerySync } from '../../../lib/useQuerySync.svelte';
-	import type { TasksAPIResponse } from '../../api/tasks/[querysync]/+server';
 	import { tasksQs } from './query.svelte';
 	import Task from './Task.svelte';
-
-	const response = useQuerySync<TasksAPIResponse>(tasksQs);
 </script>
 
 <div class="flex flex-col gap-2 p-4 pb-6">
@@ -37,7 +33,7 @@
 </div>
 
 <div class="px-4">
-	{#await response.value}
+	{#await tasksQs.response.value}
 		<div class="loading">Loading...</div>
 	{:then data}
 		{#if data.tasks && data.tasks.length > 0}

@@ -3,8 +3,8 @@ import type { QuerySync } from './QuerySync.svelte';
 import type { EmptyFilters } from './utils/filters';
 import { Routes } from './utils/routes';
 
-export const useSyncedRoute = <T extends EmptyFilters>(
-	qs: QuerySync<T>,
+export const useSyncedRoute = <T extends EmptyFilters, APIResponse extends object>(
+	qs: QuerySync<T, APIResponse>,
 	initialQueryString: string
 ) => {
 	const routes = new Routes(qs);

@@ -5,15 +5,25 @@ import { DEBOUNCE_TIME } from './utils/consts';
 import { type EmptyFilters } from './utils/filters.js';
 import type { JSONSerializable } from './utils/JSONSerializable.js';
 import { completeOptions, type Options } from './utils/options.js';
+import { Routes } from './utils/routes';
 
-export class QuerySync<T extends EmptyFilters> {
+export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 	filters: T;
 	defaultFilters: Readonly<T>;
 	options: Required<Options<T>>;
-	private shortenerKeybindings: Record<string, string> = {};
-	private expanderKeybindings: Record<string, string> = {};
+	response = $state({ value: new Promise<APIResponse>(() => {}) });
+
+	/* Internal Properties */
+	private readonly routes = new Routes(this);
 	private timeoutId: ReturnType<typeof setTimeout> | null = null;
-	onChange: () => Promise<void> = async () => {};
+	private memo: Record<string, APIResponse> = {};
+	private readonly keybindings: {
+		filtersShortener: Record<string, string>;
+		filtersExpander: Record<string, string>;
+	} = {
+		filtersShortener: {},
+		filtersExpander: {}
+	};
 
 	constructor(options: Options<T>) {
 		this.options = completeOptions(options);
@@ -22,12 +32,32 @@ export class QuerySync<T extends EmptyFilters> {
 		this.generateKeybindings();
 	}
 
+	private async fetchData(): Promise<APIResponse> {
+		const queryString = await this.toString();
+		if (queryString in this.memo) {
+			console.log(queryString + " already memo'd");
+			return this.memo[queryString];
+		}
+		console.log('fetching...');
+		if (this.options.apiFetcher) {
+			const result = await this.options.apiFetcher(this.filters);
+			this.memo[queryString] = result;
+			return result;
+		}
+		const url = await this.routes.resolveAPIUrl(queryString);
+		const response = await fetch(url);
+		const result = await response.json();
+		this.memo[queryString] = result;
+		return result;
+	}
+
 	private hook() {
-		console.log('hooked');
 		if (this.timeoutId !== null) clearTimeout(this.timeoutId);
 		this.timeoutId = setTimeout(async () => {
 			if (!browser) return;
-			this.onChange();
+			const queryString = await this.toString();
+			this.routes.goToPage(queryString);
+			this.response.value = this.fetchData();
 			this.timeoutId = null;
 		}, DEBOUNCE_TIME);
 	}
@@ -57,8 +87,8 @@ export class QuerySync<T extends EmptyFilters> {
 		for (let i = 0; i < filters.length; i++) {
 			const shortened = alphanumericBaseConverter.encode([i]);
 			const expanded = filters[i];
-			this.shortenerKeybindings[expanded] = shortened;
-			this.expanderKeybindings[shortened] = expanded;
+			this.keybindings.filtersShortener[expanded] = shortened;
+			this.keybindings.filtersExpander[shortened] = expanded;
 		}
 	}
 
@@ -68,7 +98,7 @@ export class QuerySync<T extends EmptyFilters> {
 			if (this.defaultFilters[key] === this.filters[key]) {
 				continue;
 			}
-			const shortenedKey = this.shortenerKeybindings[key];
+			const shortenedKey = this.keybindings.filtersShortener[key];
 			if (shortenedKey) {
 				shortened[shortenedKey] = this.filters[key];
 			} else {
@@ -89,7 +119,7 @@ export class QuerySync<T extends EmptyFilters> {
 		const shortened: Record<string, any> = await compression.decompress(queryString);
 		const expanded: T = new this.options.filters();
 		for (const key in shortened) {
-			const expandedKey = this.expanderKeybindings[key];
+			const expandedKey = this.keybindings.filtersExpander[key];
 			if (expandedKey) {
 				(expanded[expandedKey] as Record<string, any>) = shortened[key];
 			}
