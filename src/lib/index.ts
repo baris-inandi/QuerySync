@@ -1,12 +1,5 @@
-import { QuerySync } from './QuerySync.svelte.js';
-import { useSyncedRoute } from './useSyncedRoute.js';
-import { EmptyFilters, TabularFilters } from './utils/filters.js';
-import type { Options } from './utils/options.js';
+import { QuerySync } from "./QuerySync.svelte.js";
+import { EmptyFilters, TabularFilters } from "./utils/defaultFilters.svelte.js";
+import type { Options } from "./utils/options.js";
 
-export {
-	EmptyFilters,
-	QuerySync,
-	TabularFilters,
-	useSyncedRoute,
-	type Options as QuerySyncOptions
-};
+export { EmptyFilters, QuerySync, TabularFilters, type Options as QuerySyncOptions };

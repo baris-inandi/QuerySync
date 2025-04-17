@@ -1,6 +1,6 @@
-import { json } from '@sveltejs/kit';
-import { tasksQs } from '../../../tasks/[querysync]/tasksQs';
-import { getDummyTasks } from './dummy.js';
+import { json } from "@sveltejs/kit";
+import { tasksQs } from "../../../tasks/[querysync]/tasksQs.svelte";
+import { getDummyTasks } from "./dummy.js";
 
 export interface TasksAPIResponse {
 	tasks: {
@@ -17,6 +17,6 @@ export async function GET({ params }) {
 		return json(getDummyTasks(filters), { status: 200 });
 	} catch (error) {
 		console.error(error);
-		return json({ error: 'Invalid or malformed query string' }, { status: 400 });
+		return json({ error: "Invalid or malformed query string" }, { status: 400 });
 	}
 }

@@ -1,2 +1,2 @@
 export const DEBOUNCE_TIME = 250;
-export const TEMPLATE_STRING = '{query}';
+export const TEMPLATE_STRING = "{query}";

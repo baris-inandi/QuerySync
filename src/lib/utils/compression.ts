@@ -1,8 +1,8 @@
-import baseX from 'base-x';
-import { deflate, inflate } from 'pako';
-import type { JSONSerializable } from './JSONSerializable.js';
+import baseX from "base-x";
+import { deflate, inflate } from "pako";
+import type { JSONSerializable } from "./JSONSerializable.js";
 
-const baseConverter = baseX('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.');
+const baseConverter = baseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.");
 
 export const compression = {
 	compress: async (stringifyable: JSONSerializable): Promise<string> => {
@@ -19,7 +19,7 @@ export const compression = {
 	},
 
 	decompress: async <T>(encodedString: string): Promise<T> => {
-		const FAIL_MSG = 'Failed to decompress query string';
+		const FAIL_MSG = "Failed to decompress query string";
 		try {
 			const compressed = baseConverter.decode(encodedString);
 			const decompressed = await new Promise<Uint8Array>((resolve, reject) => {
