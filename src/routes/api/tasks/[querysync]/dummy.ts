@@ -1,5 +1,5 @@
-import type { TasksFilters } from '../../../tasks/[querysync]/tasksQs';
-import type { TasksAPIResponse } from './+server.js';
+import type { TasksFilters } from "../../../tasks/[querysync]/tasksQs.svelte";
+import type { TasksAPIResponse } from "./+server.js";
 
 // prettier-ignore
 const DUMMY_TASKS = [
@@ -215,14 +215,10 @@ export const getDummyTasks = (filters: TasksFilters): TasksAPIResponse => {
 
 	if (filters.description) {
 		const descLower = filters.description.toLowerCase();
-		filteredTasks = filteredTasks.filter((task) =>
-			task.description.toLowerCase().includes(descLower)
-		);
+		filteredTasks = filteredTasks.filter((task) => task.description.toLowerCase().includes(descLower));
 	}
 
-	filteredTasks = filters.completedOnly
-		? filteredTasks.filter((task) => task.completed)
-		: filteredTasks;
+	filteredTasks = filters.completedOnly ? filteredTasks.filter((task) => task.completed) : filteredTasks;
 
 	return {
 		tasks: filteredTasks

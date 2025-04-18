@@ -7,14 +7,12 @@ const baseConverter = baseX("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNO
 export const compression = {
 	compress: async (stringifyable: JSONSerializable): Promise<string> => {
 		const input = new TextEncoder().encode(JSON.stringify(stringifyable));
-
 		const compressed = await new Promise<Uint8Array>((resolve) => {
 			Promise.resolve().then(() => {
 				const result = deflate(input);
 				resolve(result);
 			});
 		});
-
 		return baseConverter.encode(compressed);
 	},
 

@@ -1,26 +1,28 @@
-import { EmptyFilters } from './filters.js';
+import { EmptyFilters } from "./defaultFilters.svelte.js";
 
 export interface Options<T extends EmptyFilters> {
-	filters: new () => T;
+	filtersClass: new () => T;
 	pagePath?: string | (() => string);
 	apiPath?: string | (() => string);
 	noFilterString?: string;
-	apiFetcher?: (filters: T) => Promise<any>;
+	apiFetcher?: null | ((filters: T) => Promise<any>);
+	memoization?: boolean;
+	debugLogs?: boolean;
 }
 
-export const DEFAULT_OPTIONS: Options<EmptyFilters> = {
-	filters: EmptyFilters,
-	pagePath: '',
-	apiPath: '',
-	noFilterString: 'all',
-	apiFetcher: undefined
+export const DEFAULT_OPTIONS: Required<Options<EmptyFilters>> = {
+	filtersClass: EmptyFilters,
+	pagePath: "",
+	apiPath: "",
+	noFilterString: "all",
+	apiFetcher: null,
+	memoization: true,
+	debugLogs: false
 };
 
-export const completeOptions = <T extends EmptyFilters>(
-	options: Partial<Options<T>>
-): Required<Options<T>> => {
+export const completeOptions = <T extends EmptyFilters>(options: Partial<Options<T>>): Required<Options<T>> => {
 	return {
-		...(DEFAULT_OPTIONS as Required<Options<EmptyFilters>>),
+		...DEFAULT_OPTIONS,
 		...options
 	} as Required<Options<T>>;
 };
