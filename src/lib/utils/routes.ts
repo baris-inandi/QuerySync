@@ -12,7 +12,9 @@ export class Routes<T extends EmptyFilters> {
 
 	async resolveTemplateRoute(template: string | (() => string), queryString: string): Promise<string> {
 		if (queryString == "") queryString = this.options.noFilterString;
-		return typeof template === "function" ? template() : template.replace(TEMPLATE_STRING, queryString);
+		return typeof template === "function"
+			? template().replace(TEMPLATE_STRING, queryString)
+			: template.replace(TEMPLATE_STRING, queryString);
 	}
 
 	async goToPage(queryString: string): Promise<void> {
