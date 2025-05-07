@@ -12,7 +12,7 @@ export class Memo {
 		this.options = options;
 	}
 
-	async runOrGet<T extends object>(key: string, resolver: (key: string) => Promise<T>): Promise<T> {
+	async resolve<T>(key: string, resolver: (key: string) => Promise<T>): Promise<T> {
 		if (!this.options.memoization) {
 			return await resolver(key);
 		}

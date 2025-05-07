@@ -17,7 +17,8 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 	private readonly _response = $state({ value: new Promise<APIResponse>(() => {}) });
 	private readonly _filters = $state({ value: {} } as { value: T });
 	private readonly routes: Routes<T>;
-	private readonly memo: Memo;
+	private readonly responseMemo: Memo;
+	private readonly queryStringMemo: Memo;
 	private readonly keybindings: {
 		filtersShortener: Record<string, string>;
 		filtersExpander: Record<string, string>;
@@ -44,12 +45,13 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 		this.filters = new this.options.filtersClass();
 		this.generateKeybindings();
 		this.routes = new Routes(this.options);
-		this.memo = new Memo(this.options);
+		this.responseMemo = new Memo(this.options);
+		this.queryStringMemo = new Memo(this.options);
 		debuglog(this.options.debugLogs, "QuerySync instantiated.");
 	}
 
 	private async fetchData(): Promise<APIResponse> {
-		return this.memo.runOrGet(await this.toString(), async (queryString) => {
+		return this.responseMemo.resolve(await this.toString(), async (queryString) => {
 			debuglog(this.options.debugLogs, `Fetching from API: '${queryString}'`);
 			if (this.options.apiFetcher) {
 				debuglog(this.options.debugLogs, `Using custom apiFetcher function for '${queryString}'`);
@@ -86,23 +88,25 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 	}
 
 	async toString(): Promise<string> {
-		const shortened: Record<string, any> = {};
-		const filtersSnapshot = $state.snapshot(this.filters) as T;
-		for (const key in filtersSnapshot) {
-			if (this.defaultFilters[key] === filtersSnapshot[key]) {
-				continue;
+		return this.queryStringMemo.resolve<string>(JSON.stringify(this.filters), () => {
+			const shortened: Record<string, any> = {};
+			const filtersSnapshot = $state.snapshot(this.filters) as T;
+			for (const key in filtersSnapshot) {
+				if (this.defaultFilters[key] === filtersSnapshot[key]) {
+					continue;
+				}
+				const shortenedKey = this.keybindings.filtersShortener[key];
+				if (shortenedKey) {
+					shortened[shortenedKey] = filtersSnapshot[key];
+				} else {
+					shortened[key] = filtersSnapshot[key];
+				}
 			}
-			const shortenedKey = this.keybindings.filtersShortener[key];
-			if (shortenedKey) {
-				shortened[shortenedKey] = filtersSnapshot[key];
-			} else {
-				shortened[key] = filtersSnapshot[key];
+			if (Object.keys(shortened).length === 0) {
+				return Promise.resolve(this.options.noFilterString);
 			}
-		}
-		if (Object.keys(shortened).length === 0) {
-			return this.options.noFilterString;
-		}
-		return compression.compress(shortened as JSONSerializable);
+			return compression.compress(shortened as JSONSerializable);
+		});
 	}
 
 	async applyQueryString(queryString: string): Promise<T> {
