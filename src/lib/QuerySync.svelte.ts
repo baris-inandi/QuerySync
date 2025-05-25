@@ -127,6 +127,10 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 		return this.filters;
 	}
 
+	reset() {
+		this.applyQueryString(this.options.noFilterString);
+	}
+
 	onMount(initialQueryString: string) {
 		return () => {
 			(async () => {
