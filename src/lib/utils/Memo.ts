@@ -12,6 +12,10 @@ export class Memo {
 		this.options = options;
 	}
 
+	clear() {
+		this.storage.clear();
+	}
+
 	async resolve<T>(key: string, resolver: (key: string) => Promise<T>): Promise<T> {
 		if (!this.options.memoization) {
 			return await resolver(key);

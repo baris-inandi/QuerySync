@@ -127,6 +127,11 @@ export class QuerySync<T extends EmptyFilters, APIResponse extends object> {
 		return this.filters;
 	}
 
+	clearMemo() {
+		this.responseMemo.clear();
+		this.queryStringMemo.clear();
+	}
+
 	reset() {
 		this.applyQueryString(this.options.noFilterString);
 		this.commit()();
